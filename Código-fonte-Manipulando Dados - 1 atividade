@@ -1,0 +1,61 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+int main() {
+
+    FILE *arquivo;
+    // nl = Contador do números de linha (eu abreviei para não ficar grande).
+    int nl = 0;
+    char linha[100];
+
+    struct caracteristicas {
+        // Como o telefone tem caractêres especiais ("()" e "-"), eu transformei ele em string.
+        char nome[50], curso[50], telefone[30];
+        float nota1, nota2,media;
+    }dados[100];
+
+    arquivo = fopen("DadosEntrada.csv", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+        exit(1);
+    }
+
+    printf("\n");
+
+    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+        // Eu utilizei o %50[^,] para ler 50 caractêres ou ate a virgula.
+        // Eu uilizei o sscanf para ler cada linha do arquivo.
+        sscanf(linha, "%50[^,],%30[^,],%50[^,],%f,%f", dados[nl].nome, dados[nl].telefone, dados[nl].curso, &dados[nl].nota1, &dados[nl].nota2);
+        nl++;
+        printf("%s", linha);
+    }
+    fclose(arquivo);
+
+    printf("\n\n");
+
+    FILE *final;
+
+    final = fopen("SituacaoFinal.csv","w");
+    if(final == NULL){
+        printf("Erro ao criar o arquivo!");
+        exit(1);
+    }
+
+    fprintf(final, "Nome, Média, Situação Final\n");
+
+    for (int i = 1; i < nl; i++) {
+        dados[i].media = (dados[i].nota1 + dados[i].nota2)/2;
+        if(dados[i].media >= 7){
+            fprintf(final, "%s, %.2f, APROVADO\n", dados[i].nome, dados[i].media);
+        }else{
+            fprintf(final, "%s, %.2f, REPROVADO\n", dados[i].nome, dados[i].media);
+        }
+    }
+
+    fclose(final);
+
+    printf("O arquivo SituacaoFinal.csv foi criado!\n\n");
+
+    return 0;
+}
