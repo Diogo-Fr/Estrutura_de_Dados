@@ -1,0 +1,81 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+// Essas duas são variáveis globais.
+int comp = 0;
+int swaps = 0;
+
+void swap(char **A, char **B){
+    char *Temp = *A;
+    *A = *B;
+    *B = Temp;
+    // Contador de trocas.
+    swaps++;
+}
+
+int Particao(char *Vetor[], int inf, int sup){
+    char *Pivo = Vetor[(sup)];
+    int i = inf - 1;
+
+    for(int j = inf; j <= sup - 1; j++){
+        // Contador de comparações.
+        comp++;
+        if(strcmp(Vetor[j], Pivo) <= 0){
+            i++;
+            swap(&Vetor[i], &Vetor[j]);
+        }
+    }
+    swap(&Vetor[i + 1], &Vetor[sup]);
+    return(i + 1);
+}
+
+void Quicksort(char *Vetor[], int inf, int sup) {
+    if(inf < sup) {
+        int P = Particao(Vetor, inf, sup);
+        Quicksort(Vetor, inf, P - 1);
+        Quicksort(Vetor, P + 1, sup);
+    }
+}
+
+int main() {
+    // Eu retirei os acentos.
+    char *arr[20] = {"maca", "banana", "pera", "uva", "laranja", "abacaxi", "limao", "manga", "abacate", "kiwi", "cereja", "morango", "pessego", "goiaba", "melancia", "framboesa", "amora", "caqui", "figo", "papaya"};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int arr_mediana = n/2;
+
+    printf("\nCodigo nao ordenado:\n");
+    for(int i = 0; i < n; i++) printf("%s  ", arr[i]);
+    printf("\n");
+    Quicksort(arr, 0, n - 1);
+    printf("\nCodigo ordenado:\n");
+    for(int i = 0; i < n; i++) printf("%s  ", arr[i]);
+    char *mediana = arr[arr_mediana];
+
+    printf("\n\n");
+
+    printf("Numero de comparacoes: %d\n", comp);
+    printf("Numero de trocas: %d\n", swaps);
+    printf("Mediana do conjunto de dados: %s\n\n", mediana);
+
+    FILE *arquivo;
+
+    arquivo = fopen("VetorOrdenado.txt","w");
+    if(arquivo == NULL){
+        printf("Arquivo não criado!");
+        exit(1);
+    }
+
+    fprintf(arquivo, "Número de comparações: %d\n", comp);
+    fprintf(arquivo, "Número de trocas: %d\n", swaps);
+    fprintf(arquivo, "Vetor ordenado:\n");
+    for(int i = 0; i < n; i++){
+        fprintf(arquivo, "(%i) %s\n",i+1, arr[i]);
+   }
+
+   printf("O arquivo foi criado com sucesso!");
+
+    fclose(arquivo);
+    
+    return 0;
+}
