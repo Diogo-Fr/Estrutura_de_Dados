@@ -50,8 +50,20 @@ int main() {
     Quicksort(arr, 0, n - 1);
     printf("\nCodigo ordenado:\n");
     for(int i = 0; i < n; i++) printf("%s  ", arr[i]);
-    char *mediana = arr[arr_mediana];
-
+    char *mediana;
+    if (n % 2 == 1) {
+        mediana = arr[arr_mediana];
+    } else {
+        char *mediana1 = arr[arr_mediana];
+        char *mediana2 = arr[arr_mediana - 1];
+        // Malloc é uma conversão de tipo, ele vai garantir que o ponteiro retornado seja do tipo char.
+        mediana = (char *)malloc(strlen(mediana1) + strlen(mediana2) + 1);
+        strcpy(mediana, mediana1);
+        // strcat anexa uma string a outra.
+        strcat(mediana, "/");
+        strcat(mediana, mediana2);
+    }
+    
     printf("\n\n");
 
     printf("Numero de comparacoes: %d\n", comp);
