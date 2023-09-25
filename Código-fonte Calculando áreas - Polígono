@@ -1,0 +1,104 @@
+Ponto.h:
+#ifndef PONTO_H
+#define PONTO_H
+
+typedef struct {
+    float x;
+    float y;
+} Ponto;
+
+float calcularAreaPoligono(Ponto* pontos, int numPontos);
+float calcularAlturaTriangulo(Ponto* pontos, int numPontos);
+float calcularPerimetro(Ponto* pontos, int numPontos);
+
+#endif
+
+ponto.c:
+#include<math.h>
+#include "ponto.h"
+
+float calcularAreaPoligono(Ponto* pontos, int numPontos) {
+    float area = 0.0;
+
+    for (int i = 0; i < numPontos; i++) {
+        int j = (i + 1) % numPontos;
+        area += (pontos[i].x * pontos[j].y) - (pontos[j].x * pontos[i].y);
+    }
+
+    area = 0.5 * area;
+    if (area < 0) {
+        area = -area; // A área não pode ser negativa.
+    }
+
+    return area;
+}
+
+float calcularAlturaTriangulo(Ponto* pontos, int numPontos) {
+    if (numPontos != 3) {
+        return 0.0;
+    }
+    // Sqrt é para calcular a raiz quadrada e pow para calcular a potência.
+    float a = sqrt(pow(pontos[1].x - pontos[2].x, 2) + pow(pontos[1].y - pontos[2].y, 2));
+    float b = sqrt(pow(pontos[0].x - pontos[2].x, 2) + pow(pontos[0].y - pontos[2].y, 2));
+    float c = sqrt(pow(pontos[0].x - pontos[1].x, 2) + pow(pontos[0].y - pontos[1].y, 2));
+
+    float s = (a + b + c) / 2.0;
+    float area = sqrt(s * (s - a) * (s - b) * (s - c));
+
+    if (b == 0) {
+        return 0.0;
+    }
+
+    return (2.0 * area) / b;
+}
+
+float calcularPerimetro(Ponto* pontos, int numPontos) {
+    float perimetro = 0.0;
+
+    for (int i = 0; i < numPontos; i++) {
+        int j = (i + 1) % numPontos;
+        float distancia = sqrt(pow(pontos[i].x - pontos[j].x, 2) + pow(pontos[i].y - pontos[j].y, 2));
+        perimetro += distancia;
+    }
+
+    return perimetro;
+}
+
+main.c:
+#include<stdio.h>
+#include<stdlib.h>
+#include "ponto.h"
+
+int main() {
+    FILE* arquivo;
+    int numPontos;
+
+    arquivo = fopen("poligono.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        exit(1);
+    }
+
+    fscanf(arquivo, "%d", &numPontos);
+    // Malloc é usado para alocar uma memória de uma maneira dinâmica.
+    Ponto* pontos = (Ponto*)malloc(numPontos * sizeof(Ponto));
+
+    for (int i = 0; i < numPontos; i++) {
+        fscanf(arquivo, "%f %f", &pontos[i].x, &pontos[i].y);
+    }
+
+    fclose(arquivo);
+
+    float area = calcularAreaPoligono(pontos, numPontos);
+    printf("A area do poligono e: %.2f\n", area);
+
+    if (numPontos == 3) {
+        float altura = calcularAlturaTriangulo(pontos, numPontos);
+        printf("A altura do triangulo e: %.2f\n", altura);
+    }
+
+    float perimetro = calcularPerimetro(pontos, numPontos);
+    printf("O perimetro do poligono e: %.2f\n", perimetro);
+
+    return 0;
+}
